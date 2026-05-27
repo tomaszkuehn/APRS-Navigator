@@ -1,0 +1,3 @@
+#!/bin/sh
+cd /user/aprs
+/user/aprs/aprs

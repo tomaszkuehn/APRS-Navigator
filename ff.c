@@ -1,0 +1,17 @@
+
+extern const char f15x22[];
+//#include "aprs.h"
+//#include "bigsym.h"
+//#include "digits.h"
+//#include "f12x16.h"
+//#include "f15x15.h"
+//#include "f19x23.h"
+//#include "f20x23.h"
+//#include "f23x28.h"
+//#include "f7x10.h"
+//#include "f8x10.h"
+//#include "f8x11.h"
+//#include "f8x8.h"
+//#include "f9x14.h"
+//#include "sym_mono.h"
+//#include "znaki.h"

@@ -1,0 +1,10 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/tomaszk/Documents/aprs",
+            "binaryPath": "/home/tomaszk/Documents/aprs/aprs",
+            "binaryArgs": []
+        }
+    ],
+    "makefile.configureOnOpen": true
+}

@@ -1,0 +1,23 @@
+config.c - usuniecie konfiguracji coma - linie 1144...
+aprs-rx.c - wymaga calkowitego dostosowania
+eeprom.c - dostosowanie
+gps.c - SerHandler zaremowana linia z U0LSR
+	gps_process cala tresc procedury wykasowana
+graphics.c - w funkcji send_stats (tresc funkcji usunieta)
+	     w funkcji station_announce	 usuniete dwa fragmenty po if serial0_opt
+pheriperial.c - initiaqlize_pheriperial - zaremowane
+		spi_request_handler usuniete odwolania do rejestrow
+		setsound - --''--
+		read_kbd wymaga napisania od nowa
+		send_m8 - wykasowane
+		get_m8 - wykasowane
+		crypter - wykasowany
+		crypter1 - wykasowany	     
+		test_crypt - zwraca 1
+		test_call - zwraca 1
+s65lib.c - wymaga napisania symulatora
+serial.c - obsluga portow szeregowych wymaga dostosowania
+sta_manager.c - station_serial_list wyremowane
+		station_www_list wyremowane		
+graphics.c - poprawka w traffic stats (zmienna max mozliwe dzielenie przez 0)
+		

@@ -1,0 +1,50 @@
+
+
+#include <stdio.h>
+          #include <sys/socket.h>
+          #include <arpa/inet.h>
+          #include <stdlib.h>
+          #include <string.h>
+          #include <unistd.h>
+          #include <netinet/in.h>
+
+          #define BUFFSIZE 132
+          void Die(char *mess) { perror(mess); exit(1); }
+
+ int main(int argc, char *argv[]) {
+            int sock,len;
+            struct sockaddr_in sin,csin;
+            char buffer[BUFFSIZE];
+            unsigned int echolen;
+            int bytes;
+	    time_t tt;
+	    char ss[100];
+
+            if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+              Die("Failed to create socket");
+            }
+             /* Construct the server sockaddr_in structure */
+            memset(&sin, 0, sizeof(sin));       /* Clear struct */
+            sin.sin_family = AF_INET;                  /* Internet/IP */
+            sin.sin_addr.s_addr = INADDR_ANY;  /* IP address */
+            sin.sin_port = htons(464);       /* server port */
+            /* Establish connection */
+	    bind(sock,(struct sockaddr *) &sin,  sizeof(sin));
+	    tt=time(NULL)+10;
+	    while(tt>time(NULL));
+while(1){	    
+	    
+	    memset(&csin, 0, sizeof(csin));
+	    bytes=sizeof(csin);
+	    if(len=recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *)&csin, &bytes))
+	    {
+	     buffer[len]=0;	     
+	     inet_ntop(AF_INET,&csin.sin_addr.s_addr,ss,40);
+	     printf("received %s %s\n",ss,buffer);
+	     sprintf(ss,"answer (%s)",buffer);
+	     //printf("loop:%s\n",ss);	    
+	     
+	     sendto(sock, ss, strlen(ss), 0, (struct sockaddr *)&csin, sizeof(csin));
+	    }
+}//while	    
+}	    

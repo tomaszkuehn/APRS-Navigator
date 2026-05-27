@@ -1,0 +1,147 @@
+ Project Review: APRS Navigator (FHI Navigator) v0.88b
+
+  Author: T. Kuehn, SP3FHI | Copyright: 2005-2006 | ~17,600 lines of C
+
+  Summary
+
+  This is an embedded-to-PC port of an ARM7 (Philips LPC2000) APRS terminal firmware, adapted to run on Linux using X11
+  as a simulated LCD. It decodes APRS/AX.25 amateur radio packets, displays stations on list/radar/compass views,
+  handles GPS NMEA input, digipeating, messaging, and beaconing. The port to Linux is incomplete — many subsystems are
+  stubbed out, and the project shows its embedded origins everywhere.
+
+  ---
+  Architecture
+
+  The application performs the main loop in goapp() (app.c, ~1500 lines) with a cooperative-multitasking model: a timer
+  drives the APRS packet processing (tc1_alarm via SIGALRM + ualarm), and keyboard input is polled via X11 events. The
+  LCD display is emulated by drawing into an X11 window pixel-by-pixel (s65lib.c + graphics.c).
+
+  Key data flow: radio/TNC packets → aprs-rx.c buffer → tc1() polling → update_aprs() → station list (sta_manager.c) →
+  display rendering (graphics.c → s65lib.c → X11).
+
+  ---
+  Critical Issues
+
+  1. Hardcoded remote IP addresses in publicly visible source
+
+  Two files contain hardcoded internet host IPs:
+  - aprs-ip.c:12 — 81.15.165.158:443 (APRS-IS server)
+  - telnet.c:13 — 212.122.192.50:1314 (telnet server)
+
+  These IPs are 20 years old and likely no longer valid, but they represent a potential information disclosure. The
+  telnet client also has no authentication or encryption.
+
+  2. XTEA encryption with hardcoded keys in plaintext (xtea.c:40-43, xtea.c:86-89)
+
+  The anti-piracy/hack-check mechanism uses XTEA with keys burned into the source. Since this is an open codebase, the
+  "protection" is trivially bypassed — and in the PC port, test_crypt() and test_call() in peripherial.c:157-167 both
+  just return(1), bypassing all checks anyway.
+
+  3. Unsafe pointer/size pattern across the entire configuration system
+
+  globals.c and config.c use hardcoded byte-offset math to serialize/deserialize configuration into flash pages. For
+  example, globals.c:373-403 reads raw bytes from flash into struct fields by numeric offset:
+
+  flash_read(napis, 2002, 254);
+  digidupetime = napis[0];
+  announce_filter = napis[1];
+  // ... ~30 more fields by offset
+
+  A single off-by-one or flash corruption silently corrupts all subsequent fields. There is no version marker, no magic
+  number, and no checksum.
+
+  4. Race condition in "exclusive flag" guarding (aprs-rx.c:15)
+
+  aprs_exclusive_flag is used as a poor-man's mutex between the timer ISR and main loop, but it's a plain char with no
+  atomicity guarantees. In aprs-rx.c:223-232 and aprs-rx.c:278-292, the "lock" is set to 1, work is done, then set to 0.
+   Function is not reentrant — any nested call increments aprsf and the code detects >1 and prints "RX ERROR", but
+  doesn't actually prevent the reentry.
+
+  5. NEVER sentinel is 2,000,000,000 which wraps after ~6.3 years of uptime
+
+  globals.h:124 defines #define NEVER 2000000000. The timebase is 0.1s ticks, so this is ~200M seconds (~6.3 years). On
+  any system running continuously past that point (or with a non-zero start time), "never" conditions become "now"
+  conditions.
+
+  6. Division by zero identified but not fixed
+
+  From pcver.txt:22: "graphics.c - poprawka w traffic stats (zmienna max mozliwe dzielenie przez 0)" — the developer
+  noted a possible division-by-zero in the traffic statistics display but the fix status is unclear.
+
+  7. GPS NMEA parser only handles GPGGA/GPRMC
+
+  gps.c only parses GPGGA (position) and GPRMC (course/speed). Modern GPS receivers also output GNGGA/GNRMC
+  (multi-constellation) and the parser will silently skip these. The checksum validation is correct though.
+
+  8. Buffer overflow risk in simulated packet strings
+
+  aprs-rx.c:29-38 defines fixed strings like s0[], s1[], etc. The simpacket() function copies them into bufmem without
+  bounds checking at line 80, and tmpbuf at 256 bytes could overflow the destination.
+
+  ---
+  Code Quality Issues
+
+  - Massive files: sta_manager.c (2,802 lines), graphics.c (2,343 lines), s65lib.c (2,003 lines), app.c (1,554 lines),
+  config.c (1,556 lines) — all doing too many things.
+  - Commented-out code everywhere: ~40% of some files is dead code wrapped in #ifdef nouse, /* ... */ blocks, or just
+  raw commented lines. globals.c alone has ~30% commented-out initialization code.
+  - Global variable sprawl: globals.h declares ~100 extern global variables with no namespace prefix. Everything is
+  mutable from everywhere.
+  - Polish comments throughout: barrier for non-Polish-speaking contributors.
+  - No header guards: None of the .h files use #ifndef/#define include guards. Multiple inclusion is prevented only by
+  convention.
+  - Backup files committed: aprs-rx.c~ and aprs-ip.c~ (Emacs backup files) are present in the directory.
+  - Compiled binary in source tree: The aprs ELF binary (235 KB) is checked into the source directory. The ip/sim and
+  ip/client binaries too.
+  - Inconsistent main(): demo.c contains the real main(). The filename "demo" is misleading — it's the actual entry
+  point.
+  - sprintf without format string: In debugmsg() at globals.c:713, the message is passed directly as a format string:
+  printf(msg). A message containing %s or %n would be a vulnerability.
+  - Mixed tabs and spaces: Inconsistent indentation throughout (visible in globals.c).
+  - Empty stub functions: serial.c has getchar(), getchar1(), putchar1() all with empty bodies returning nothing
+  (undefined behavior for non-void return).
+  - telnet.c:15: char *buf[buflen] declares an array of 512 pointers, not a 512-byte buffer. This is a type error — it
+  should be char buf[buflen]. The local buf[buflen] at line 45 shadows it.
+
+  ---
+  Build Issues
+
+  - Makefile refers to pcemu.o (line 9) but this isn't in the aprs target's dependency list (line 6). It's compiled but
+  never linked.
+  - No C standard specified: gcc with only -funsigned-char. No -Wall, -Wextra, -std=c99, or optimization flags.
+  - -L/usr/include/X11: This is a library search path pointing at the include directory, not the library directory.
+  Should be -L/usr/lib/X11 or similar. It likely works by accident if the linker finds X11 elsewhere.
+  - VS Code settings point to /home/tomaszk/Documents/aprs — a hardcoded Linux path that won't work on other machines.
+  - No cross-platform abstraction: The X11 dependency makes this Linux-only. The #include <X11/Xlib.h> chain pulls in
+  X11 headers even on modules that shouldn't need them.
+  - No install target, no uninstall, no clean target in the makefile.
+
+  ---
+  What's Working Well
+
+  - The XTEA implementation (xtea.c) is a correct implementation of the algorithm.
+  - The APRS AX.25 frame format handling in aprs-rx.c follows the protocol specification.
+  - The flash/EEPROM emulation (eeprom.c) with its circular buffer and slot collision detection (get_freepage()) is a
+  reasonable approach for the constraints.
+  - The font rendering and bitmap system (11 font sizes + symbol fonts) is comprehensive.
+  - The NMEA checksum validation in gps.c is correct.
+  - The station sorting/recalc (sta_manager.c) with distance/bearing math is functionally complete.
+
+  ---
+  Recommendations (in priority order)
+
+  1. Add -Wall -Wextra to the makefile and fix all warnings — this alone will catch the telnet.c pointer/array bug,
+  missing returns, and dozens of other issues.
+  2. Add clean target to makefile, remove binaries and backup files from source tree.
+  3. Add header guards to all .h files.
+  4. Fix debugmsg() format string vulnerability — use printf("%s", msg).
+  5. Replace the aprs_exclusive_flag spinlock with a proper mutex or stdatomic if the timer interrupt model stays.
+  6. Fix the NEVER sentinel to use UINT32_MAX or a 64-bit type.
+  7. Add a version/magic/checksum to the flash config format so corrupted config is detected.
+  8. Remove hardcoded IP addresses or move them to a config file.
+  9. Redact the XTEA keys from public source if they're still in use anywhere.
+
+  ---
+  Overall, this is a functional but rough embedded-to-desktop port. The core APRS logic is solid (the author clearly
+  understood the protocol), but the project carries 20 years of technical debt from its embedded origins. It works as a
+  simulator/demo, but would need significant cleanup to serve as a foundation for ongoing development.
