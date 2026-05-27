@@ -14,21 +14,36 @@
 
 //#define sim
 
+#define SCALE 2         /* display scale factor — 1 = original, 2 = double resolution */
 
-#define S1X	15
-#define S2X	240
-#define SY	35
+#define DISP_W_ORIG 132  /* logical vertical resolution (height in pixels) */
+#define DISP_H_ORIG 176  /* logical horizontal resolution (width in pixels)  */
+#define S1X_ORIG    15   /* left panel X offset */
+#define S2X_ORIG    240  /* right panel X offset */
+#define SY_ORIG     35   /* top margin */
+
+#define S1X	(S1X_ORIG * SCALE)
+#define S2X	(S2X_ORIG * SCALE)
+#define SY	(SY_ORIG * SCALE)
 
 #define  uint32_t  unsigned long
 #define  uint16_t  unsigned int
 #define	 uint8_t   unsigned char
 
-#define DISP_W 132
-#define DISP_H 176
+#define DISP_W (DISP_W_ORIG * SCALE)
+#define DISP_H (DISP_H_ORIG * SCALE)
 #define CHAR_H 14
 #define CHAR_W 8
 #define TEXT_COL 16
 #define TEXT_ROW 12
+
+#define BY (180 * SCALE)    /* button row Y base, below LCD panels */
+
+/* Y coordinate transform: logical y (0=bottom, DISP_W_ORIG-1=top) → physical */
+#define LCD_Y(y)  (SY_ORIG + DISP_W_ORIG - 1 - (y)) * SCALE
+
+/* smooth pixel rendering: draw rounded 2×2 blocks for anti-aliased look */
+#define SMOOTH_PIXEL 1
 
 #define SPIF 0x80
 
@@ -66,7 +81,7 @@ button buttons[100];
 int buttons_num=0;
 int pixmap_sync=0;
 
-#define XWh	260
+#define XWh	(260 * SCALE)
 
 //############## XWindows graphics procedures ##############
 
@@ -168,12 +183,12 @@ int x,y;
 void clear_x_window()
 {
 
- XFillRectangle(disp,pixmap,gc,0,0,490,XWh);
+ XFillRectangle(disp,pixmap,gc,0,0,490*SCALE,XWh);
 }
 
 void pixmap_x_sync()
 {
- XCopyArea(disp,pixmap,window,gc,0,0,490,XWh,0,0);
+ XCopyArea(disp,pixmap,window,gc,0,0,490*SCALE,XWh,0,0);
  XSync(disp,0);
 }
 
@@ -212,7 +227,7 @@ void open_x_window()
 {
 int screen, depth;
 unsigned long bg,fg;
-char *font="8x13";
+char *font="fixed";
 //char *font="9x14";
 	
 	printf("Disp\n");
@@ -228,9 +243,10 @@ char *font="8x13";
 	fg = WhitePixel(disp, screen);
 	
 	font_info=XLoadQueryFont(disp,font);
-  if (!(font_info)){printf("No font_info!\n");exit(1);}
-	printf("font done\n");
-        width=490; height=XWh;
+	if(!font_info) font_info=XLoadQueryFont(disp,"fixed");
+	if(!font_info){printf("Warning: no system font\n");}
+	else {printf("font done\n");}
+        width=490*SCALE; height=XWh;
 	
         depth = DefaultDepth (disp, screen);
 	window = XCreateSimpleWindow (disp, DefaultRootWindow(disp),
@@ -544,13 +560,13 @@ XEvent	event;
     
     //set_x_color(1.0,1.0,1.0);
     set_x_color(0.0,0.0,0.0);
-    XFillRectangle(disp,pixmap,gc,10,180,410,70);
+    XFillRectangle(disp,pixmap,gc,10*SCALE,180*SCALE,410*SCALE,70*SCALE);
     set_x_color(1.0,1.0,1.0);
-    XDrawRectangle(disp,pixmap,gc,11,181,408,68);
+    XDrawRectangle(disp,pixmap,gc,11*SCALE,181*SCALE,408*SCALE,68*SCALE);
     XSetFont(disp,gc,font1->fid);
     //set_x_color(0.0,0.0,0.0);
     set_x_color(1.0,1.0,1.0);
-    draw_text(20,195,"Configuration");
+    draw_text(20*SCALE,195*SCALE,"Configuration");
     //draw_text(6,17,"nanoNET TRX Station v.1.2");    
     //XSetFont(disp,gc,font1->fid);
     //draw_text(5,30,"This program is a part of nanoTRX demonstration kit");
@@ -576,21 +592,21 @@ XEvent	event;
     //XFillRectangle(disp,pixmap,gc,10,320,470,100);
     //XFillRectangle(disp,pixmap,gc,10,440,470,100);
     //draw_button(300,220,40,"Config");
-    draw_button(370,230,40,"OK");
+    draw_button(370*SCALE,230*SCALE,40*SCALE,"OK");
     //draw_switch(20,200,80,"switch",1);
-    add_radio_button(12,120,185,80,12,"");
-    add_radio_button(13,120,200,80,12,"");
-    add_radio_button(14,120,215,80,12,"");
-    add_radio_button(15,120,230,80,12,"");    
+    add_radio_button(12,120*SCALE,185*SCALE,80*SCALE,12,"");
+    add_radio_button(13,120*SCALE,200*SCALE,80*SCALE,12,"");
+    add_radio_button(14,120*SCALE,215*SCALE,80*SCALE,12,"");
+    add_radio_button(15,120*SCALE,230*SCALE,80*SCALE,12,"");
     key=0;
     for(i=0;i<8;i++){rb[i]=0;}
     rb[aprs_packet_source]=1;
-    draw_radio(120,185,80,"No packets",rb[0]);
-    draw_radio(120,200,80,"Simulate",rb[1]);
-    draw_radio(120,215,80,"Server",rb[2]);
-    draw_radio(120,230,80,"File",rb[3]);
-    draw_radio(220,185,90,"Serial modem",rb[4]);
-    draw_radio(220,200,90,"Remote modem",rb[5]);
+    draw_radio(120*SCALE,185*SCALE,80*SCALE,"No packets",rb[0]);
+    draw_radio(120*SCALE,200*SCALE,80*SCALE,"Simulate",rb[1]);
+    draw_radio(120*SCALE,215*SCALE,80*SCALE,"Server",rb[2]);
+    draw_radio(120*SCALE,230*SCALE,80*SCALE,"File",rb[3]);
+    draw_radio(220*SCALE,185*SCALE,90*SCALE,"Serial modem",rb[4]);
+    draw_radio(220*SCALE,200*SCALE,90*SCALE,"Remote modem",rb[5]);
     pixmap_x_sync();
     while(key==0)
     {
@@ -614,29 +630,29 @@ XEvent	event;
 	}
 	for(i=0;i<8;i++){rb[i]=0;}
     rb[aprs_packet_source]=1;
-    draw_radio(120,185,80,"No packets",rb[0]);
-    draw_radio(120,200,80,"Simulate",rb[1]);
-    draw_radio(120,215,80,"Server",rb[2]);
-    draw_radio(120,230,80,"File",rb[3]);
-    draw_radio(220,185,90,"Serial modem",rb[4]);
-    draw_radio(220,200,90,"Remote modem",rb[5]);
+    draw_radio(120*SCALE,185*SCALE,80*SCALE,"No packets",rb[0]);
+    draw_radio(120*SCALE,200*SCALE,80*SCALE,"Simulate",rb[1]);
+    draw_radio(120*SCALE,215*SCALE,80*SCALE,"Server",rb[2]);
+    draw_radio(120*SCALE,230*SCALE,80*SCALE,"File",rb[3]);
+    draw_radio(220*SCALE,185*SCALE,90*SCALE,"Serial modem",rb[4]);
+    draw_radio(220*SCALE,200*SCALE,90*SCALE,"Remote modem",rb[5]);
 	pixmap_x_sync();
     }
 
     }
     //restore view
     set_x_color(0.0,0.0,0.0);
-    XFillRectangle(disp,pixmap,gc,10,180,410,70);
-    draw_button(20,180,40,"Opt");
-    	draw_button(120,180,40,"Up");
-    	draw_button(220,180,40,"Disp");
-    	draw_button(20,200,40,"<-");
-    	draw_button(120,200,40,"Ent");
-    	draw_button(220,200,40,"->");
-    	draw_button(20,220,40,"Menu");
-    	draw_button(120,220,40,"Dn");
-    	draw_button(220,220,40,"Shift");
-    	draw_button(320,230,60,"Config");
+    XFillRectangle(disp,pixmap,gc,10*SCALE,180*SCALE,410*SCALE,70*SCALE);
+    draw_button(20*SCALE,180*SCALE,40*SCALE,"Opt");
+    	draw_button(120*SCALE,180*SCALE,40*SCALE,"Up");
+    	draw_button(220*SCALE,180*SCALE,40*SCALE,"Disp");
+    	draw_button(20*SCALE,200*SCALE,40*SCALE,"<-");
+    	draw_button(120*SCALE,200*SCALE,40*SCALE,"Ent");
+    	draw_button(220*SCALE,200*SCALE,40*SCALE,"->");
+    	draw_button(20*SCALE,220*SCALE,40*SCALE,"Menu");
+    	draw_button(120*SCALE,220*SCALE,40*SCALE,"Dn");
+    	draw_button(220*SCALE,220*SCALE,40*SCALE,"Shift");
+    	draw_button(320*SCALE,230*SCALE,60*SCALE,"Config");
 	buttons_num=11;
 }
 
@@ -700,30 +716,38 @@ int i;
     sleep(3);
 /*
     font1=XLoadQueryFont(disp,"f8x8.h");
-    if (!(font1)){printf("No fonts1!\n");exit(1);}
+    if (!(font1)){printf("No fonts1!\n");printf("Warning: no system font
+");}
     font2=XLoadQueryFont(disp,"f8x8");
-    if (!(font2)){printf("No fonts2!\n");exit(1);}
+    if (!(font2)){printf("No fonts2!\n");printf("Warning: no system font
+");}
     font3=XLoadQueryFont(disp,"f9x14");
-    if (!(font3)){font3=XLoadQueryFont(disp,"9x15");}//alternate
-    if (!(font3)){printf("No fonts3!\n");exit(1);}
+    if (!(font3)){font3=XLoadQueryFont(disp,"fixed");}//alternate
+    if (!(font3)){printf("No fonts3!\n");printf("Warning: no system font
+");}
 */
-    font1=XLoadQueryFont(disp,"5x8");
+    font1=XLoadQueryFont(disp,"fixed");
+    if(!font1) font1=XLoadQueryFont(disp,"7x14");
     font2=font1;
     font3=font1;
 
     for(i=0;i<100;i++){buttons[i].active=0;}
-    buttons_num=11; 
-    add_button(1,20,180,40,"Opt");	draw_button(20,180,40,"Opt");
-    add_button(2,120,180,40,"Up");	draw_button(120,180,40,"Up");
-    add_button(3,220,180,40,"Disp");	draw_button(220,180,40,"Disp");
-    add_button(4,20,200,40,"<-");	draw_button(20,200,40,"<-");
-    add_button(5,120,200,40,"Ent");	draw_button(120,200,40,"Ent");
-    add_button(6,220,200,40,"->");	draw_button(220,200,40,"->");
-    add_button(7,20,220,40,"Menu");	draw_button(20,220,40,"Menu");
-    add_button(8,120,220,40,"Dn");	draw_button(120,220,40,"Dn");
-    add_button(9,220,220,40,"Shift");	draw_button(220,220,40,"Shift");
-    add_button(10,320,230,60,"Config");	draw_button(320,230,60,"Config");
-    add_button(11,370,230,40,"OK");
+    buttons_num=11;
+#define BX2(x)  ((x)*SCALE)
+#define BSZ(s)  ((s)*SCALE)
+    add_button(1, BX2(20),BY,BSZ(40),"Opt");     draw_button(BX2(20),BY,BSZ(40),"Opt");
+    add_button(2,BX2(120),BY,BSZ(40),"Up");      draw_button(BX2(120),BY,BSZ(40),"Up");
+    add_button(3,BX2(220),BY,BSZ(40),"Disp");    draw_button(BX2(220),BY,BSZ(40),"Disp");
+    add_button(4, BX2(20),BY+20*SCALE,BSZ(40),"<-");   draw_button(BX2(20),BY+20*SCALE,BSZ(40),"<-");
+    add_button(5,BX2(120),BY+20*SCALE,BSZ(40),"Ent");  draw_button(BX2(120),BY+20*SCALE,BSZ(40),"Ent");
+    add_button(6,BX2(220),BY+20*SCALE,BSZ(40),"->");   draw_button(BX2(220),BY+20*SCALE,BSZ(40),"->");
+    add_button(7, BX2(20),BY+40*SCALE,BSZ(40),"Menu"); draw_button(BX2(20),BY+40*SCALE,BSZ(40),"Menu");
+    add_button(8,BX2(120),BY+40*SCALE,BSZ(40),"Dn");   draw_button(BX2(120),BY+40*SCALE,BSZ(40),"Dn");
+    add_button(9,BX2(220),BY+40*SCALE,BSZ(40),"Shift");draw_button(BX2(220),BY+40*SCALE,BSZ(40),"Shift");
+    add_button(10,BX2(320),BY+50*SCALE,BSZ(60),"Config"); draw_button(BX2(320),BY+50*SCALE,BSZ(60),"Config");
+    add_button(11,BX2(370),BY+50*SCALE,BSZ(40),"OK");
+#undef BX2
+#undef BSZ
     //add_button(4,10,280,90,"Pause TX");
     //add_button(5,110,280,90,"Pause RX");
     //add_button(6,210,280,90,"Pause RP");
@@ -731,8 +755,7 @@ int i;
     //add_button(8,250,550,90,"Quit");
     set_x_color(1.0,1.0,1.0);
     XSetFont(disp,gc,font3->fid);
-    draw_text(5,20,"APRS Navigator simulator");
-    draw_text(5,21,"APRS Navigator simulator");
+    draw_text(5*SCALE,40,"APRS Navigator simulator");
 }
 
 void simled(int x, int y,float color1, float color2, float color3)
@@ -933,9 +956,9 @@ sim_redraw();
 void LCDclear()
 {
 set_x16_color(LCDcolor_background);
-if((lcds==1)||(lcds==3))XFillRectangle(disp,pixmap,gc,S1X,SY,176,132);
-if((lcds==2)||(lcds==3))XFillRectangle(disp,pixmap,gc,S2X,SY,176,132);
-  	
+if((lcds==1)||(lcds==3))XFillRectangle(disp,pixmap,gc,S1X,SY,DISP_H,DISP_W);
+if((lcds==2)||(lcds==3))XFillRectangle(disp,pixmap,gc,S2X,SY,DISP_H,DISP_W);
+
 
 }
 
@@ -1278,9 +1301,9 @@ void chargen(unsigned char c)
 
 int i,k;
 char ch,mask,p;
-int ofsx,ofsy;
+int ofsx,ofsy; unsigned int _sav;
 
-    if(lcds==2){ofsx=S2X;}else{ofsx=S1X;}
+    // scaled via setPixel
     ofsy=SY;
     
     set_x16_color(LCDcolor_foreground);
@@ -1301,7 +1324,7 @@ int ofsx,ofsy;
           if (ch&mask)
           {
 	  set_x16_color(LCDcolor_foreground);
-	  if(cursorx<176)XDrawPoint(disp,pixmap,gc,cursorx+ofsx,131-cursory+ofsy-p);
+	  if(cursorx<DISP_H_ORIG) setPixel(cursorx, cursory+p);
 	  
 		    //S0SPDR=LCDcolor_foreground>>8;
 	//udelay();
@@ -1313,8 +1336,8 @@ int ofsx,ofsy;
           }
           else
           {
-	  set_x16_color(LCDcolor_background);
-	  if(cursorx<176)XDrawPoint(disp,pixmap,gc,cursorx+ofsx,131-cursory+ofsy-p);
+	  _sav=LCDcolor_foreground; LCDcolor_foreground=LCDcolor_background;
+	  if(cursorx<DISP_H_ORIG) setPixel(cursorx, cursory+p); LCDcolor_foreground=_sav;
 //		  S0SPDR=LCDcolor_background>>8;
 	//udelay();
 //    while(!(S0SPSR &(SPIF)));//wait send
@@ -1328,8 +1351,8 @@ int ofsx,ofsy;
 		cursorx++;
   }
   for(p=0;p<8;p++){
-          set_x16_color(LCDcolor_background);
-	  if(cursorx<176)XDrawPoint(disp,pixmap,gc,cursorx+ofsx,131-cursory+ofsy-p);
+          _sav=LCDcolor_foreground; LCDcolor_foreground=LCDcolor_background;
+	  if(cursorx<DISP_H_ORIG) setPixel(cursorx, cursory+p); LCDcolor_foreground=_sav;
   // S0SPDR=LCDcolor_background>>8;
 	//udelay();
     //while(!(S0SPSR &(SPIF)));//wait send
@@ -1351,9 +1374,9 @@ void smchargen(unsigned char c)
 
 int i,k;
 char ch,mask,p;
-int ofsx,ofsy;
+int ofsx,ofsy; unsigned int _sav;
     
-    if(lcds==2){ofsx=S2X;}else{ofsx=S1X;}
+    // scaled via setPixel
     ofsy=SY;
     
     set_x16_color(LCDcolor_foreground);
@@ -1367,13 +1390,13 @@ k=0;
 if(c==32)
 {
   for(p=0;p<7;p++){
-	    set_x16_color(LCDcolor_background);
-	    if(cursorx<176)XDrawPoint(disp,pixmap,gc,cursorx+ofsx,131-cursory+ofsy-p);
+	    _sav=LCDcolor_foreground; LCDcolor_foreground=LCDcolor_background;
+	    if(cursorx<DISP_H_ORIG) setPixel(cursorx, cursory+p); LCDcolor_foreground=_sav;
   }
   cursorx=cursorx+1;
   for(p=0;p<7;p++){
-	    set_x16_color(LCDcolor_background);
-	    if(cursorx<176)XDrawPoint(disp,pixmap,gc,cursorx+ofsx,131-cursory+ofsy-p);
+	    _sav=LCDcolor_foreground; LCDcolor_foreground=LCDcolor_background;
+	    if(cursorx<DISP_H_ORIG) setPixel(cursorx, cursory+p); LCDcolor_foreground=_sav;
   }
   cursorx=cursorx+1;
 }
@@ -1388,12 +1411,12 @@ while((small[i+k]>0)&&(k<5)){
           if (ch&mask)
           {
             set_x16_color(LCDcolor_foreground);
-	    if(cursorx<176)XDrawPoint(disp,pixmap,gc,cursorx+ofsx,131-cursory+ofsy-p);
+	    if(cursorx<DISP_H_ORIG) setPixel(cursorx, cursory+p);
           }
           else
           {
-            set_x16_color(LCDcolor_background);
-	    if(cursorx<176)XDrawPoint(disp,pixmap,gc,cursorx+ofsx,131-cursory+ofsy-p);
+            _sav=LCDcolor_foreground; LCDcolor_foreground=LCDcolor_background;
+	    if(cursorx<DISP_H_ORIG) setPixel(cursorx, cursory+p); LCDcolor_foreground=_sav;
           }
           mask=mask/2;
         }  // for p
@@ -1401,8 +1424,8 @@ while((small[i+k]>0)&&(k<5)){
  k=k+1;
 }
 for(p=0;p<7;p++){
-	    set_x16_color(LCDcolor_background);
-	    if(cursorx<176)XDrawPoint(disp,pixmap,gc,cursorx+ofsx,131-cursory+ofsy-p);
+	    _sav=LCDcolor_foreground; LCDcolor_foreground=LCDcolor_background;
+	    if(cursorx<DISP_H_ORIG) setPixel(cursorx, cursory+p); LCDcolor_foreground=_sav;
 }
 cursorx++;
 }
@@ -1424,17 +1447,18 @@ void LCDyx(char y, char x)
 
 void setPixel(int x, int y)
 {
-int x1,y1;
+int px, py;
 
-  //if(x>175){return;}
-  if(lcds==2){x=x+S2X;}else{x=x+S1X;}
-  //y=(131-y)+10;
-  y=(131+SY)-y;
+  if(lcds==2){px=x*SCALE+S2X;}else{px=x*SCALE+S1X;}
+  py = LCD_Y(y);
   set_x16_color(LCDcolor_foreground);
-  XDrawPoint(disp,pixmap,gc,x,y);
-  
-  //XSync(disp,0);
-  //pixmap_x_sync();
+#if SMOOTH_PIXEL && SCALE >= 2
+  /* rounded 2×2 block — skip corner pixels for anti-aliased appearance */
+  XFillRectangle(disp,pixmap,gc,px,py,SCALE,SCALE-1);
+  XDrawPoint(disp,pixmap,gc,px+SCALE-1,py+SCALE-1);
+#else
+  XFillRectangle(disp,pixmap,gc,px,py,SCALE,SCALE);
+#endif
 }
 
 void setPixelgv(int x, int y, char r, char g, char b)
@@ -1562,13 +1586,13 @@ int i;
 unsigned int d;
 
  set_x16_color(LCDcolor_foreground);
- if(lcds==2){x0=x0+S2X;x1=x1+S2X;}else{x0=x0+S1X;x1=x1+S1X;}
-  //y=(131-y)+10;
-  y0=(131+SY)-y0;
-  y1=(131+SY)-y1;
+ if(lcds==2){x0=x0*SCALE+S2X;x1=x1*SCALE+S2X;}
+        else {x0=x0*SCALE+S1X;x1=x1*SCALE+S1X;}
+  y0 = LCD_Y(y0);
+  y1 = LCD_Y(y1);
   if(x0>x1){i=x0;x0=x1;x1=i;}
   if(y0>y1){i=y0;y0=y1;y1=i;}
-  XFillRectangle(disp,pixmap,gc,x0,y0,x1-x0+1,y1-y0+1);
+  XFillRectangle(disp,pixmap,gc,x0,y0,(x1-x0+SCALE),(y1-y0+SCALE));
 }
 
 

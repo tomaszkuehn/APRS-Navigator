@@ -172,21 +172,28 @@ rendering. Currently implemented by `s65lib.c` (X11 backend, 2,003 lines).
 | `flagfixed` | `char` | Fixed-width font spacing flag |
 | `pixmap_sync` | `int` | Set to 1 to trigger display flush on next `read_kbd()` |
 
-**LCD coordinate system**
+**LCD coordinate system + 2x scaling**
 
-Two virtual LCD panels, each 132×176 pixels, arranged side by side:
+Two virtual LCD panels, each 132×176 logical pixels rendered at 2× scale
+(264×352 physical pixels). Configured via `#define SCALE 2` in s65lib.c.
 
 ```
-  ┌─────────────┬─────────────┐
-  │  Layer 1    │  Layer 2    │
-  │  (LEFT)     │  (RIGHT)    │
-  │  15..147    │  240..372   │
-  └─────────────┴─────────────┘
-        ↑             ↑
-      S1X=15       S2X=240    SY=35 (top margin)
+  ┌──────────────────┬──────────────────┐
+  │  Layer 1 (LEFT)  │  Layer 2 (RIGHT) │
+  │  132×176 logical │  132×176 logical │
+  │  264×352 phys    │  264×352 phys    │
+  │  X: 30..294      │  X: 480..744     │
+  └──────────────────┴──────────────────┘
+         ↑                    ↑
+      S1X=30             S2X=480      SY=70 (top margin)
 ```
 
 `LCDselect(1)` draws to left panel, `LCDselect(2)` to right, `LCDselect(3)` to both.
+
+**Smooth pixel rendering**: When `SMOOTH_PIXEL` is enabled (default), each logical
+pixel is drawn as a rounded 2×2 block — filling 2×1 main area plus a corner pixel —
+producing anti-aliased edges on fonts, lines, and circles. Set `SMOOTH_PIXEL 0` in
+s65lib.c for crisp block-pixel scaling. Set `SCALE` to 1 for original resolution.
 
 ### 2.2 Display Backend (Pluggable)
 
