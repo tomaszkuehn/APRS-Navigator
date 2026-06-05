@@ -1,6 +1,3 @@
-#ifndef S65LIB_H
-#define S65LIB_H
-
 extern void pixmap_x_sync(void);
 extern int pixmap_sync;
 
@@ -68,5 +65,4 @@ extern int get_x_key();
 #define ICONKEY6  0x12
 #define ICONKEY7  0x13
 
-#endif
 

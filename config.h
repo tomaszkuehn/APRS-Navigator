@@ -1,5 +1,3 @@
-#ifndef CONFIG_H
-#define CONFIG_H
 
 extern void config_position();
 extern void config_filter();
@@ -31,6 +29,5 @@ extern void config_contacts();
 extern void config_sounds();
 extern void capture_position(char id);
 
-#endif
 
 

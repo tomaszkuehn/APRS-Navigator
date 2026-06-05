@@ -1,6 +1,3 @@
-#ifndef BIGSYM_H
-#define BIGSYM_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -49,6 +46,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef bigsym_H
+#define bigsym_H
 
 #define bigsym_WIDTH 23
 #define bigsym_HEIGHT 43

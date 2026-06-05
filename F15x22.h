@@ -1,6 +1,3 @@
-#ifndef F15X22_H
-#define F15X22_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -181,4 +178,5 @@ const char f15x22[] = {
     0x37, 0xA9, 0x9B, 0xD2, 0x09
 };
 
-#endif
+
+

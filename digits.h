@@ -1,6 +1,3 @@
-#ifndef DIGITS_H
-#define DIGITS_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef digits_H
+#define digits_H
 
 #define digits_WIDTH 16
 #define digits_HEIGHT 17

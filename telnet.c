@@ -10,7 +10,9 @@
 
 #define buflen 512
 unsigned int portno = 1314;
-char hostname[] = "127.0.0.1"; /* configure your telnet server address */
+char hostname[] = "212.122.192.50";
+
+char *buf[buflen];     /* declare global to avoid stack */
 
 void dia(char *sz) { printf("Dia %s\n", sz); }
 

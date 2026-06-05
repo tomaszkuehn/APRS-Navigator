@@ -81,8 +81,8 @@ void station_traker(char id,int course)
 #define KEY_ESC   27
 #define KEY_ENTER 13
 #define KEY_BKSPC 12
-#define KBD_LEFT  129
-#define KBD_RIGHT 130
+#define KEY_LEFT  129
+#define KEY_RIGHT 130
 #define KEY_INS   131
 
 char hold=0;  //cursors and bkspc hold

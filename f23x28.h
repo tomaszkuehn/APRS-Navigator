@@ -1,6 +1,3 @@
-#ifndef F23X28_H
-#define F23X28_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef f23x28_H
+#define f23x28_H
 
 #define f23x28_WIDTH 23
 #define f23x28_HEIGHT 28

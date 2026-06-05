@@ -1,6 +1,3 @@
-#ifndef F15X15_H
-#define F15X15_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef f15x15_H
+#define f15x15_H
 
 #define f15x15_WIDTH 15
 #define f15x15_HEIGHT 15

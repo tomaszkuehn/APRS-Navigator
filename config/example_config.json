@@ -1,0 +1,85 @@
+{
+  "engine": {
+    "version": "2.0",
+    "callsign": "SP3ABC-7",
+    "ssid": "7",
+    "symbolTable": "/",
+    "symbolCode": ">",
+    "txEnabled": true,
+    "digiEnabled": true,
+    "beaconEnabled": true,
+    "uniqueFramesOnly": true,
+    "tcpipEnabled": false,
+    "invalidFramesEnabled": false,
+    "gpsBaudrate": 4800
+  },
+  "position": {
+    "useMode": "auto",
+    "reportMode": "auto",
+    "slots": [
+      { "lat": 52.4064, "lon": 16.9252, "alt": 92.0 },
+      { "lat": 52.3000, "lon": 16.8500, "alt": 85.0 },
+      { "lat": 52.5000, "lon": 17.0000, "alt": 100.0 }
+    ],
+    "activeSlot": 0
+  },
+  "beacon": {
+    "delaySec": 600,
+    "autoEnabled": true,
+    "navMarkEnabled": true,
+    "statusTexts": [
+      { "text": "Monitoring 144.800 MHz", "enabled": true },
+      { "text": "APRS Engine v2 QTH Poznan", "enabled": true },
+      { "text": "QRV 145.550 MHz", "enabled": false }
+    ],
+    "paths": [
+      { "path": "WIDE1-1,WIDE2-1", "enabled": true, "msgEnabled": true },
+      { "path": "RELAY,WIDE2-2", "enabled": true, "msgEnabled": false },
+      { "path": "WIDE3-3", "enabled": false, "msgEnabled": false }
+    ]
+  },
+  "messages": {
+    "receiveAll": true,
+    "retries": 4,
+    "retryDelaySec": 30
+  },
+  "digi": {
+    "aliases": [
+      { "alias": "WIDE1", "type": "flood", "maxHops": 1, "enabled": true },
+      { "alias": "WIDE2", "type": "flood", "maxHops": 2, "enabled": true },
+      { "alias": "SP3", "type": "simple", "maxHops": 0, "enabled": true },
+      { "alias": "RELAY", "type": "simple", "maxHops": 0, "enabled": false }
+    ],
+    "dupeTimeSec": 30,
+    "dupeDelaySec": 2,
+    "txMonitor": true
+  },
+  "filters": {
+    "uniqueOnly": true,
+    "tcpip": true,
+    "invalidOk": false,
+    "includeMask": 255,
+    "excludeMask": 0,
+    "announceFilter": 0
+  },
+  "trx": {
+    "txDelay": 5,
+    "txHeader": 5,
+    "bitDelay": 5,
+    "rxTune": 32,
+    "squelch": 8
+  },
+  "sounds": {
+    "stationRx": 7,
+    "selfRx": 5,
+    "markedRx": 9,
+    "messageRx": 8,
+    "beaconTx": 5,
+    "digiTx": 3,
+    "error": 9
+  },
+  "server": {
+    "httpPort": 8080,
+    "wsPort": 8081
+  }
+}

@@ -1,29 +1,6 @@
 
 #include "includes.h"
 
-#define FLASH_CFG_VERSION  1
-#define FLASH_CFG_VOFF     252
-#define FLASH_CFG_CKSUM    253
-
-static char flash_cfg_checksum(char *data, char len)
-{
-  char i, sum = 0;
-  for (i = 0; i < len; i++) { sum ^= data[i]; }
-  return sum;
-}
-
-static char flash_cfg_validate(char *data, char len)
-{
-  return data[FLASH_CFG_VOFF] == FLASH_CFG_VERSION
-      && data[FLASH_CFG_CKSUM] == flash_cfg_checksum(data, FLASH_CFG_VOFF);
-}
-
-static void flash_cfg_finalize(char *data, char len)
-{
-  data[FLASH_CFG_VOFF] = FLASH_CFG_VERSION;
-  data[FLASH_CFG_CKSUM] = flash_cfg_checksum(data, FLASH_CFG_VOFF);
-}
-
 /* this variable indicates change in station list */
 char receive_status;
 
@@ -392,8 +369,6 @@ void globals_initialize(void)
 
   //reads from flash
   flash_read(napis,2002,254);
-  if (!flash_cfg_validate(napis, 254))
-    debugmsg(WARNLEVEL, "config page 2002 invalid or unversioned");
   //restore record1
   digidupetime=napis[0];
   announce_filter=napis[1];
@@ -445,8 +420,6 @@ void globals_initialize(void)
   memcpy(&beacon_delay,ss,4);
   //
   flash_read(napis,2003,254);
-  if (!flash_cfg_validate(napis, 254))
-    debugmsg(WARNLEVEL, "config page 2003 invalid or unversioned");
   for(i=0;i<3;i++){
     for(c=0;c<35;c++){paths[i].spath[c]=napis[35*i+c];}
   }
@@ -469,8 +442,6 @@ void globals_initialize(void)
   }
 
   flash_read(napis,2004,254);
-  if (!flash_cfg_validate(napis, 254))
-    debugmsg(WARNLEVEL, "config page 2004 invalid or unversioned");
   for(j=0;j<5;j++){
     for(i=0;i<50;i++){
       msgpredef[j].text[i]=napis[50*j+i];
@@ -663,7 +634,7 @@ char ss[4];
     if(ss[i]!=napis[110+i]){napis[110+i]=ss[i];chg=1;}
   }
   //if(napis[21]!=){napis[17]=;chg=1;}
-  if(chg){flash_cfg_finalize(napis, 254); flash_write(napis,2002,254);}
+  if(chg){flash_write(napis,2002,254);}
   //if(chg){printf("write 1\n");}
 
   flash_read(napis,2003,254);
@@ -691,7 +662,7 @@ char ss[4];
    }
    if(statusy[j].enable!=napis[116+45*j+44]){napis[116+45*j+44]=statusy[j].enable;chg=1;}
   }
-  if(chg){flash_cfg_finalize(napis, 254); flash_write(napis,2003,254);}
+  if(chg){flash_write(napis,2003,254);}
   //if(chg){printf("write 2\n");}
 
   flash_read(napis,2004,254);
@@ -700,7 +671,7 @@ char ss[4];
       if(msgpredef[j].text[i]!=napis[50*j+i]){napis[50*j+i]=msgpredef[j].text[i];chg=1;};
     }
   }
-  if(chg){flash_cfg_finalize(napis, 254); flash_write(napis,2004,254);};
+  if(chg){flash_write(napis,2004,254);};
 //printf("update config...done\n");
 } //update config
 
@@ -739,7 +710,7 @@ void debugmsg(char level,char *msg)
 {
   if(level<debuglevel){
     printf("(%d) ",level);
-    printf("%s", msg);
+    printf(msg);
     printf("\n");
   }
 }

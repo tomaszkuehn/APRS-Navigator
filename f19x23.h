@@ -1,6 +1,3 @@
-#ifndef F19X23_H
-#define F19X23_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef f19x23_H
+#define f19x23_H
 
 #define f19x23_WIDTH 20
 #define f19x23_HEIGHT 23

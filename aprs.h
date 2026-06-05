@@ -1,6 +1,3 @@
-#ifndef APRS_BITMAP_H
-#define APRS_BITMAP_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -49,6 +46,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef aprs_H
+#define aprs_H
 
 #define aprs_WIDTH 37
 #define aprs_HEIGHT 37

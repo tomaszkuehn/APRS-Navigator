@@ -1,9 +1,6 @@
 
 
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
-
 #define MAX_STATIONS	151
 #define MAX_INFO        54
 #define MAX_MESSAGES    20
@@ -124,7 +121,7 @@ typedef struct {
   unsigned long time;
 } _selfdigi;
 
-#define NEVER   0xFFFFFFFF
+#define NEVER   2000000000
 #define NOTEMP  -127
 
 
@@ -356,5 +353,3 @@ extern const char symtable[];
 
 //peripherials
 extern char ser_kbden;
-
-#endif

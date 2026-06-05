@@ -1,6 +1,3 @@
-#ifndef SYM_MONO_H
-#define SYM_MONO_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef sym_mono_H
+#define sym_mono_H
 
 #define sym_mono_WIDTH 35
 #define sym_mono_HEIGHT 22

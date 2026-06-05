@@ -1,0 +1,85 @@
+{
+  "engine": {
+    "version": "2.0",
+    "callsign": "NOCALL",
+    "ssid": "",
+    "symbolTable": "/",
+    "symbolCode": ">",
+    "txEnabled": true,
+    "digiEnabled": true,
+    "beaconEnabled": true,
+    "uniqueFramesOnly": true,
+    "tcpipEnabled": false,
+    "invalidFramesEnabled": false,
+    "gpsBaudrate": 4800
+  },
+  "position": {
+    "useMode": "auto",
+    "reportMode": "auto",
+    "slots": [
+      { "lat": 52.4064, "lon": 16.9252, "alt": 92.0 },
+      { "lat": 52.4064, "lon": 16.9252, "alt": 92.0 },
+      { "lat": 52.4064, "lon": 16.9252, "alt": 92.0 }
+    ],
+    "activeSlot": 0
+  },
+  "beacon": {
+    "delaySec": 600,
+    "autoEnabled": true,
+    "navMarkEnabled": false,
+    "statusTexts": [
+      { "text": "APRS Engine v2", "enabled": true },
+      { "text": "", "enabled": false },
+      { "text": "", "enabled": false }
+    ],
+    "paths": [
+      { "path": "WIDE1-1,WIDE2-1", "enabled": true, "msgEnabled": false },
+      { "path": "", "enabled": false, "msgEnabled": false },
+      { "path": "", "enabled": false, "msgEnabled": false }
+    ]
+  },
+  "messages": {
+    "receiveAll": false,
+    "retries": 4,
+    "retryDelaySec": 35
+  },
+  "digi": {
+    "aliases": [
+      { "alias": "WIDE1", "type": "flood", "maxHops": 1, "enabled": true },
+      { "alias": "", "type": "simple", "maxHops": 0, "enabled": false },
+      { "alias": "", "type": "simple", "maxHops": 0, "enabled": false },
+      { "alias": "", "type": "simple", "maxHops": 0, "enabled": false }
+    ],
+    "dupeTimeSec": 30,
+    "dupeDelaySec": 2,
+    "txMonitor": true
+  },
+  "filters": {
+    "uniqueOnly": true,
+    "tcpip": true,
+    "invalidOk": false,
+    "includeMask": 255,
+    "excludeMask": 0,
+    "announceFilter": 0
+  },
+  "trx": {
+    "txDelay": 5,
+    "txHeader": 5,
+    "bitDelay": 5,
+    "rxTune": 32,
+    "squelch": 8
+  },
+  "sounds": {
+    "stationRx": 5,
+    "selfRx": 5,
+    "markedRx": 5,
+    "messageRx": 5,
+    "beaconTx": 5,
+    "digiTx": 5,
+    "error": 5
+  },
+  "server": {
+    "httpPort": 8080,
+    "wsPort": 8081
+  }
+}

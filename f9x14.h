@@ -1,6 +1,3 @@
-#ifndef F9X14_H
-#define F9X14_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef f9x14_H
+#define f9x14_H
 
 #define f9x14_WIDTH 9
 #define f9x14_HEIGHT 14

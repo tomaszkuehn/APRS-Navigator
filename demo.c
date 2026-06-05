@@ -32,17 +32,6 @@ char ss[100];
    //__enable_interrupt();
   printf("PP2\n");
 
-  /* Register I/O backends */
-  extern input_backend_t input_backend_x11;
-  input_register_backend(&input_backend_x11);
-
-  extern frame_io_driver_t frame_io_simulated;
-  extern frame_io_driver_t frame_io_file;
-  extern frame_io_driver_t frame_io_udp;
-  frame_io_register(FRAME_IO_SIMULATED, &frame_io_simulated);
-  frame_io_register(FRAME_IO_FILE, &frame_io_file);
-  frame_io_register(FRAME_IO_UDP, &frame_io_udp);
-
   initLCD();
   printf("PP3\n");
 

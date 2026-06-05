@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(wsl bash *)"
+      "Bash(Get-ChildItem -Recurse -Force D:\\\\kody\\\\stare\\\\aprs)",
+      "Bash(Select-Object Mode, Length, FullName)"
     ]
   }
 }

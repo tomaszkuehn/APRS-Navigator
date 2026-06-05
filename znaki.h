@@ -1,6 +1,3 @@
-#ifndef ZNAKI_H
-#define ZNAKI_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef znaki_H
+#define znaki_H
 
 #define znaki_WIDTH 26
 #define znaki_HEIGHT 20

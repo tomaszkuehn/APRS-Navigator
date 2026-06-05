@@ -1,7 +1,4 @@
 
-#ifndef PERIPHERIAL_H
-#define PERIPHERIAL_H
-
 #define SPI_SPEED 0x00000008
 
 //extern char kbdbuf[16];
@@ -23,5 +20,4 @@ extern char test_call(char *cc);
 //0x200000;   spi slave
 //0x001000    P0.12 aprs - reset
 
-#endif
 

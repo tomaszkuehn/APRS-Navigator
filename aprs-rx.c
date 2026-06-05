@@ -8,13 +8,12 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <arpa/inet.h>
 
-volatile sig_atomic_t aprs_received_flag;
-volatile sig_atomic_t aprs_squelch_flag;
-volatile sig_atomic_t aprs_atomic_flag;
-volatile sig_atomic_t aprs_exclusive_flag;
-volatile sig_atomic_t aprs_data_flag;
+char aprs_received_flag;
+char aprs_squelch_flag;
+char aprs_atomic_flag;
+char aprs_exclusive_flag;
+char aprs_data_flag;
 
 #define REGLSR  U1LSR
 #define REGRBR  U1RBR
@@ -93,9 +92,8 @@ void aprs_rx_fopen()
 
 int file_read(char *bf)
 {
-if(fgets(bf,255,it))
-  return strlen(bf);
-return 0;
+fgets(bf,255,it);
+
 }
 
 
@@ -325,24 +323,8 @@ unsigned char i,c;
        mtmv=timeval+3; //0.3sekundy?
        remote_read();
     }
-
-    /* frame_io pluggable packet source */
-    if (aprs_packet_source >= 90 && (timeval > mtmv)) {
-       int len;
-       char fbuf[300];
-       len = frame_io_read(fbuf, sizeof(fbuf) - 1);
-       if (len > 0) {
-           fbuf[len] = 0;
-           i = 0;
-           while (fbuf[i] && i < 250) { bufmem[i] = fbuf[i]; i++; }
-           bufmem[i] = 0;
-           bufmem[0x201] = 1;
-           mtmv = timeval + 5;
-       }
-    }
 	
 }
-
 
 
 void aprs_initialize()

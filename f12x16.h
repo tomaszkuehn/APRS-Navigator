@@ -1,6 +1,3 @@
-#ifndef F12X16_H
-#define F12X16_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef f12x16_H
+#define f12x16_H
 
 #define f12x16_WIDTH 12
 #define f12x16_HEIGHT 16

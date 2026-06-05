@@ -752,7 +752,7 @@ char ur,mm;
 
 }
 
-static int pcmem=100;
+static pcmem=100;
 
 void check_receiver()
 {
@@ -1145,7 +1145,7 @@ char list_update    =0;
    }
 
    if(key==17){
-     menu();
+     menu(0);
      update_status|=UPDATE_REDRAW;
 
      radar_update   =UPDATE_REDRAW;

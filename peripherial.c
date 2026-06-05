@@ -121,7 +121,7 @@ if(spirequest>0){spi_request_handler();}
    pixmap_sync=0;
    pixmap_x_sync();
   }
-  c = input_read_key();
+  c=get_x_key();
   if(shift&&(c>0)){c=c+10;shift=0;}
   if((c==9)&&(!shift)){c=0;shift=1;}
   

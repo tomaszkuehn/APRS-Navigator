@@ -1,6 +1,3 @@
-#ifndef F8X11_H
-#define F8X11_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef f8x11_H
+#define f8x11_H
 
 #define f8x11_WIDTH 8
 #define f8x11_HEIGHT 11

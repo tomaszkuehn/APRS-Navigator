@@ -1,6 +1,3 @@
-#ifndef F20X23_H
-#define F20X23_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -142,4 +139,5 @@ const char f20x23[] = {
     0x53, 0x2A, 0x77, 0x52, 0x65, 0x6E, 0x95, 0x37, 0x14
 };
 
-#endif
+
+

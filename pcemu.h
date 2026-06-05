@@ -1,7 +1,3 @@
-#ifndef PCEMU_H
-#define PCEMU_H
+//#include "includes.h"
 
 extern void simpacket();
-
-#endif
-

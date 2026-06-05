@@ -1,6 +1,3 @@
-#ifndef F7X10_H
-#define F7X10_H
-
 /*
     created with FontEditor written by H. Reddmann
     HaReddmann at t-online dot de
@@ -50,6 +47,9 @@
 
 //#include <inttypes.h>
 //#include <avr/pgmspace.h>
+
+#ifndef f7x10_H
+#define f7x10_H
 
 #define f7x10_WIDTH 7
 #define f7x10_HEIGHT 10

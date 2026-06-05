@@ -1,5 +1,3 @@
-#ifndef EEPROM_H
-#define EEPROM_H
 
 #define MAXEEPROM       2000
 
@@ -13,5 +11,4 @@ extern void flash_write(char *data,unsigned int page, char count);
 /* zmienna ustawia sie na 1 po zapisaniu wszystkich dostepnych slotow */
 extern char eepromfull;
 
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+
 
 extern void station_announce(int id);
 extern void station_announce_clear();
@@ -55,5 +54,3 @@ extern const char f8x10[];
 //#include "f9x14.h"
 extern const char sym_mono[];
 extern const char znaki[];
-
-#endif

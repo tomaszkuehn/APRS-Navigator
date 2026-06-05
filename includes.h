@@ -1,10 +1,5 @@
 
 
-#ifndef INCLUDES_H
-#define INCLUDES_H
-
-#define _DEFAULT_SOURCE
-
 //#include "F15x22.h"
 #include "app.h"
 #include "aprs-rx.h"
@@ -36,14 +31,9 @@
 //#include "znaki.h"
 
 #include "pcemu.h"
-#include "display_backend.h"
-#include "input.h"
-#include "frame_io.h"
 #include <math.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -54,4 +44,4 @@
 #include <X11/Xos.h>
 #include <X11/Xatom.h>
 
-#endif
+

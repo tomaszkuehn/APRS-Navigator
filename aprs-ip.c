@@ -9,9 +9,9 @@
 
 #define buflen 512
 unsigned int portno = 443;
-char hostname[] = "127.0.0.1"; /* configure your APRS-IS server address */
+char hostname[] = "81.15.165.158";
 
-char buf[buflen];     /* declare global to avoid stack */
+char *buf[buflen];     /* declare global to avoid stack */
 int sd;
 char connected=0;
 

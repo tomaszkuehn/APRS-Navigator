@@ -1,5 +1,5 @@
-#ifndef GPS_H
-#define GPS_H
+//#include "includes.h"
+
 
 extern char gpslat[10];
 extern char gpslon[11];
@@ -15,5 +15,4 @@ extern void init_gps(void);
 extern void update_bygps();
 extern void gps_read();
 
-#endif
 

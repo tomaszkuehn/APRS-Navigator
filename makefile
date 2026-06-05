@@ -1,79 +1,40 @@
-HA = includes.h F15x22.h app.h aprs-rx.h aprs.h bigsym.h config.h digits.h \
-     eeprom.h f12x16.h f15x15.h f19x23.h f20x23.h f23x28.h f7x10.h f8x10.h \
-     f8x11.h f8x8.h f9x14.h globals.h gps.h graphics.h keil.h peripherial.h \
-     s65lib.h serial.h sta_manager.h sym_mono.h timer.h znaki.h \
-     display_backend.h input.h frame_io.h
-HH = includes.h
-CC = gcc
-CFLAGS = -funsigned-char -Wall -Wextra -std=c99
+# APRS Engine v2 — Top-level Makefile
+# Builds engine library, tests, and GUI client
 
-OBJS = globals.o app.o aprs-rx.o config.o eeprom.o gps.o graphics.o \
-       peripherial.o serial.o sta_manager.o demo.o timer.o s65lib.o \
-       display.o input.o input_backend_x11.o \
-       frame_io.o frame_io_simulated.o frame_io_file.o frame_io_udp.o
+CC      := gcc
+CFLAGS  := -std=c99 -Wall -Wextra -O2 -funsigned-char
+LDFLAGS := -lm
 
-aprs:		$(OBJS)
-		$(CC) -o aprs $(CFLAGS) $(OBJS) -lX11 -lm
+ENGINE_DIR    := engine
+ENGINE_INC    := -I$(ENGINE_DIR)/include -I$(ENGINE_DIR)/src
+ENGINE_LIB    := $(ENGINE_DIR)/build/libaprs_engine.a
+
+TRANSPORT_DIR := transport
+TEST_DIR      := tests
+CLIENT_DIR    := clients/gui
+
+.PHONY: all engine test gui clean run-gui
+
+all: engine test gui
+
+engine:
+	cd $(ENGINE_DIR) && $(MAKE)
+
+test: engine
+	$(CC) $(CFLAGS) $(ENGINE_INC) $(TEST_DIR)/test_engine_api.c \
+		$(ENGINE_LIB) $(LDFLAGS) -o $(TEST_DIR)/test_engine_api
+	@echo "=== Running tests ==="
+	$(TEST_DIR)/test_engine_api
+
+gui: engine
+	$(CC) -std=gnu99 -Wall -Wextra -O2 -funsigned-char $(ENGINE_INC) \
+		$(CLIENT_DIR)/gui_main.c $(CLIENT_DIR)/renderer.c \
+		$(ENGINE_LIB) $(LDFLAGS) -o $(CLIENT_DIR)/aprs_gui
+
+run-gui: gui
+	$(CLIENT_DIR)/aprs_gui
 
 clean:
-		rm -f aprs *.o
-
-globals.o: 	globals.c $(HH)
-		$(CC) -c $(CFLAGS) globals.c
-
-app.o:		app.c $(HH)
-		$(CC) -c $(CFLAGS) app.c
-
-aprs-rx.o:	aprs-rx.c $(HH)
-		$(CC) -c $(CFLAGS) aprs-rx.c
-
-config.o:	config.c $(HH)
-		$(CC) -c $(CFLAGS) config.c
-
-eeprom.o:	eeprom.c $(HH)
-		$(CC) -c $(CFLAGS) eeprom.c
-
-gps.o:		gps.c $(HH)
-		$(CC) -c $(CFLAGS) gps.c
-
-graphics.o:	graphics.c $(HH)
-		$(CC) -c $(CFLAGS) graphics.c
-
-peripherial.o:	peripherial.c $(HH)
-		$(CC) -c $(CFLAGS) peripherial.c
-
-serial.o:	serial.c $(HH)
-		$(CC) -c $(CFLAGS) serial.c
-
-sta_manager.o:	sta_manager.c $(HH)
-		$(CC) -c $(CFLAGS) sta_manager.c
-
-demo.o:		demo.c $(HH)
-		$(CC) -c $(CFLAGS) demo.c
-
-timer.o:	timer.c $(HH)
-		$(CC) -c $(CFLAGS) timer.c
-
-s65lib.o:	s65lib.c $(HH)
-		$(CC) -c $(CFLAGS) s65lib.c
-
-display.o:	display.c $(HH)
-		$(CC) -c $(CFLAGS) display.c
-
-input.o:	input.c $(HH)
-		$(CC) -c $(CFLAGS) input.c
-
-input_backend_x11.o: input_backend_x11.c $(HH)
-		$(CC) -c $(CFLAGS) input_backend_x11.c
-
-frame_io.o:	frame_io.c $(HH)
-		$(CC) -c $(CFLAGS) frame_io.c
-
-frame_io_simulated.o: frame_io_simulated.c $(HH)
-		$(CC) -c $(CFLAGS) frame_io_simulated.c
-
-frame_io_file.o: frame_io_file.c $(HH)
-		$(CC) -c $(CFLAGS) frame_io_file.c
-
-frame_io_udp.o: frame_io_udp.c $(HH)
-		$(CC) -c $(CFLAGS) frame_io_udp.c
+	cd $(ENGINE_DIR) && $(MAKE) clean
+	rm -f $(TEST_DIR)/test_engine_api
+	rm -f $(CLIENT_DIR)/aprs_gui

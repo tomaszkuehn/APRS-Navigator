@@ -1,7 +1,4 @@
 
-#ifndef KEIL_H
-#define KEIL_H
-
 #define PINSEL0     (*(REG32 (0xE002C000)))
 #define PINSEL1     (*(REG32 (0xE002C004)))
 #define PINSEL2     (*(REG32 (0xE002C014)))
@@ -38,5 +35,3 @@
 #define T0EMR          (*(REG32 (0xE000403C)))
 
 #define VPBDIV      (*(REG32 (0xE01FC100)))
-
-#endif

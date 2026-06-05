@@ -1,8 +1,5 @@
 
 
-#ifndef STA_MANAGER_H
-#define STA_MANAGER_H
-
 extern void update_aprs(char msg_start);
 extern char station_list(char startrow,char startcol,char cursor);
 extern void station_sort(char opt);
@@ -17,5 +14,4 @@ extern void transmit_message();
 extern void application_frame_get();
 extern void application_frame_send(char *ss);
 
-#endif
 
