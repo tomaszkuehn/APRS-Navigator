@@ -109,22 +109,96 @@ static void on_event(const aprs_event_t* ev, void* user) {
  * SIMULATED FRAME INJECTION
  * ======================================================================== */
 
-/* Some example APRS frames for testing */
+/* Extended APRS frames for testing — covering all major frame types */
 static const char* test_frames[] = {
-    /* Position frames */
+    /* ════════ Position frames (compressed & uncompressed) ════════ */
+    /* Stationary position with symbol */
     "SP3XYZ-9>APRS,WIDE1-1,WIDE2-1:!5210.12N/01655.22E-Test station",
     "SP9AAA-1>APRS,RELAY:!5130.50N/01610.30E&Home QTH",
+    /* Compressed position with PHG & comment */
     "SQ2BBB-2>APRS,WIDE2-2:=5200.00N/01650.00E#PHG5130 W2, Poznan",
+    /* Position with timestamp (hours/minutes) — mobile */
     "SP3CCC-3>APRS,WIDE1-1:/092345h5211.50N/01654.80EvTest/APRS mobile",
+    /* Position with timestamp (zulu) — weather */
     "SP5DDD-5>APRS,TCPIP:@092345z5220.00N/01705.00E_Test weather station",
-    /* Status frame */
+
+    /* More mobile stations around Poznan */
+    "SP3MOB-7>APRS,WIDE1-1,WIDE2-1:/152310h5225.10N/01657.30Er090/050/A=000078 APRS mobile en-route",
+    "SQ3CAR-9>APRS,WIDE2-2:/152315h5222.80N/01651.90Ek049/035/A=000095 Car mobile",
+    "SP3BIKE>APRS,WIDE1-1:`(Ml s>/]\"4q}Bike tracker|3",
+    "HF3PEN-1>APRS,WIDE2-1:=5230.15N/01640.20E-PHG2300Club station QTH",
+    "SP3WX-13>APRS,TCPIP:@152330z5228.75N/01702.40E_000/000g003t045r000p000P000h50b10120 WX3in1",
+    "SR3DPN>APRS,WIDE2-2:!5224.50N/01655.70E# Digi/repeater Poznan",
+    "SP3APR-2>APRS,WIDE1-1:/152340h5223.12N/01648.90Ev/A=000112 iGate RX-only",
+    "SQ3TSM-7>APRS,RELAY:/152345h5221.60N/01659.15E[120/000/A=000067 handheld",
+    "SP3KAK>APRS,WIDE1-1,WIDE2-1:=5215.30N/01702.80E-Antenna 12m AGL",
+    "HF3P-10>APRS,TCPIP:!5224.80N/01655.30E#WX station v2",
+
+    /* ════════ Status frames ════════ */
     "SP3XYZ-9>APRS:>Monitoring 144.800 MHz",
-    /* Message */
+    "SQ3TSM-7>APRS:>QRV 145.550 FM / 430.950 DMR",
+    "SR3DPN>APRS:>Digipeater WIDE1-1 WIDE2-2 144.800",
+    "SP3MOB-7>APRS:>En route to QTH / 73!",
+
+    /* ════════ Messages (with ACK/reply patterns) ════════ */
     "SP3XYZ-9>APRS::SP3ABC-7 :Hello from engine test{MSG-1001}",
-    /* Query */
+    "SP3ABC-7>APRS::SP3XYZ-9 :ack MSG-1001",
+    "SP3MOB-7>APRS::SQ3CAR-9 :What is your ETA?{MSG-1002}",
+    "SQ3CAR-9>APRS::SP3MOB-7 :ETA 10 minutes, almost there{MSG-1003}",
+    "SP3MOB-7>APRS::SQ3CAR-9 :ack MSG-1003",
+    "HF3PEN-1>APRS::SP3XYZ-9 :Club meeting Thursday 19:00{MSG-1004}",
+    "SP3XYZ-9>APRS::HF3PEN-1 :ack MSG-1004",
+    "SP3KAK>APRS::SP3ABC-7 :Can you relay to net?{MSG-1005}",
+
+    /* ════════ Query frames ════════ */
     "SP3XYZ-9>APRS:?APRS?",
-    /* Mic-E (simplified) */
+    "SQ3CAR-9>APRS:?APRSP?",
+    "SP3MOB-7>APRS:?IGATE?",
+
+    /* ════════ Object frames ════════ */
+    "SP3XYZ-9>APRS:;MEETING *152350z5224.00N/01654.00E-Club Meeting Point",
+    "SR3DPN>APRS:;REPEATR*152355z5225.50N/01653.90Er145.550MHz -060 R50k",
+    "SP3APR-2>APRS:;APRSIG *152400z5223.80N/01655.20EIiGate Fill-in",
+
+    /* ════════ Item frames ════════ */
+    "SP3XYZ-9>APRS:)BEACON! 152405z5224.10N/01655.40E30m APRS beacon on tower",
+
+    /* ════════ Mic-E frames ════════ */
     "SP3XYZ-9>S4T2V5,WIDE1-1:`(Fl o>/]\"4j}Test Mic-E",
+    "SP3MOB-7>S3U4S6,WIDE1-1,WIDE2-1:`(Gl!r>/]\"5s}En Route|3",
+    "SQ3CAR-9>S2Q2P8,WIDE2-1:`(El#p>/]\"4l}In Service|3",
+
+    /* ════════ Telemetry frames ════════ */
+    "SP3WX-13>APRS:T#001,120,045,030,128,095,00000000",
+
+    /* ════════ Duplicate frames (test unique filter) ════════ */
+    "SP3XYZ-9>APRS,WIDE1-1,WIDE2-1:!5210.12N/01655.22E-Test station",     /* duplicate */
+    "SP3MOB-7>APRS,WIDE1-1,WIDE2-1:/152310h5225.10N/01657.30Er090/050/A=000078 APRS mobile en-route", /* duplicate */
+
+    /* ════════ Third-party traffic ════════ */
+    "SP3APR-2>APRS:}SP3XYZ-9>APRS,WIDE1-1:!5210.12N/01655.22E-3rd party relay",
+
+    /* ════════ More stations (expanding coverage) ════════ */
+    "SP2OFR-1>APRS,WIDE2-2:=5310.50N/01750.30E-QTH Bydgoszcz area",
+    "SQ1FYB-9>APRS,WIDE1-1:/152420h5330.20N/01615.40E[180/060/A=000145 Mobile north",
+    "SP4WRZ>APRS,TCPIP:@152425z5250.00N/01730.00E_/000g006t032r000p000P000h45b10150 WX Gniezno",
+    "SR5LEO>APRS,WIDE2-2:!5220.50N/02100.30E# Digi Warszawa",
+    "SP7LUK>APRS,WIDE1-1:=5140.00N/01920.00E-PHG1200 Lodz base",
+    "SQ6ELQ-7>APRS,RELAY:/152430h5050.30N/01615.90Ev/A=000234 Mobile SW",
+    "SP8EBC-1>APRS,TCPIP:!5030.00N/01755.00E#Opole iGate",
+    "SR9NZE>APRS,WIDE2-2:!5010.50N/01950.00E# Digi Krakow",
+    "SP3PGH-9>APRS,WIDE1-1:/152435h5218.90N/01638.20Er220/085/A=000112 Mobile W",
+    "SQ3RX-2>APRS,WIDE1-1:=5222.00N/01710.50E-WX station v1.5",
+
+    /* ════════ More messages ════════ */
+    "SP3APR-2>APRS::SP3ABC-7 :New iGate firmware available v2.1{MSG-1006}",
+    "SP3ABC-7>APRS::SP3APR-2 :ack MSG-1006",
+    "SQ3TSM-7>APRS::SP3XYZ-9 :QSO on 145.550?{MSG-1007}",
+    "SP3XYZ-9>APRS::SQ3TSM-7 :ack MSG-1007",
+
+    /* ════════ Bulletins & announcements ════════ */
+    "SP3XYZ-9>APRS::BLN0     :APRS Net every Tuesday 20:00 local",
+    "SR3DPN>APRS::BLN1     :New digi in Poznan area on 144.800",
 };
 
 #define NUM_TEST_FRAMES (sizeof(test_frames) / sizeof(test_frames[0]))
@@ -209,7 +283,7 @@ int main(int argc, char** argv) {
            g_event_count, g_station_count);
 
     /* Get snapshot */
-    char snapshot[2048];
+    char snapshot[4096];
     size_t snap_len = sizeof(snapshot);
     if (aprs_engine_get_snapshot(engine, snapshot, &snap_len) == APRS_OK) {
         printf("=== Engine Snapshot ===\n%s\n\n", snapshot);
@@ -229,8 +303,8 @@ int main(int argc, char** argv) {
     }
 
     /* List stations */
-    aprs_station_t stations[10];
-    size_t st_count = 10;
+    aprs_station_t stations[30];
+    size_t st_count = 30;
     if (aprs_engine_list_stations(engine, stations, &st_count) == APRS_OK) {
         printf("\n=== Station List (%zu stations) ===\n", st_count);
         printf("%-15s %12s %12s %8s %8s %6s\n",

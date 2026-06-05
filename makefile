@@ -3,7 +3,7 @@
 
 CC      := gcc
 CFLAGS  := -std=c99 -Wall -Wextra -O2 -funsigned-char
-LDFLAGS := -lm
+LDFLAGS := -lm -lpthread
 
 ENGINE_DIR    := engine
 ENGINE_INC    := -I$(ENGINE_DIR)/include -I$(ENGINE_DIR)/src
@@ -13,9 +13,9 @@ TRANSPORT_DIR := transport
 TEST_DIR      := tests
 CLIENT_DIR    := clients/gui
 
-.PHONY: all engine test gui clean run-gui
+.PHONY: all engine test gui http-server ws-server clean run-gui run-http run-ws
 
-all: engine test gui
+all: engine test gui http-server ws-server
 
 engine:
 	cd $(ENGINE_DIR) && $(MAKE)
@@ -34,7 +34,25 @@ gui: engine
 run-gui: gui
 	$(CLIENT_DIR)/aprs_gui
 
+http-server: engine
+	$(CC) -std=gnu99 -Wall -Wextra -O2 -funsigned-char $(ENGINE_INC) \
+		$(TRANSPORT_DIR)/http/http_server.c $(TRANSPORT_DIR)/http/main.c \
+		$(ENGINE_LIB) $(LDFLAGS) -o $(TRANSPORT_DIR)/http/aprs_http_server
+
+run-http: http-server
+	$(TRANSPORT_DIR)/http/aprs_http_server
+
+ws-server: engine
+	$(CC) -std=gnu99 -Wall -Wextra -O2 -funsigned-char $(ENGINE_INC) \
+		$(TRANSPORT_DIR)/websocket/ws_server.c $(TRANSPORT_DIR)/websocket/ws_main.c \
+		$(ENGINE_LIB) $(LDFLAGS) -o $(TRANSPORT_DIR)/websocket/aprs_ws_server
+
+run-ws: ws-server
+	$(TRANSPORT_DIR)/websocket/aprs_ws_server
+
 clean:
 	cd $(ENGINE_DIR) && $(MAKE) clean
 	rm -f $(TEST_DIR)/test_engine_api
 	rm -f $(CLIENT_DIR)/aprs_gui
+	rm -f $(TRANSPORT_DIR)/http/aprs_http_server
+	rm -f $(TRANSPORT_DIR)/websocket/aprs_ws_server

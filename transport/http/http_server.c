@@ -447,13 +447,17 @@ int aprs_http_server_run(aprs_http_server_t* srv) {
             body = get_json_body(request);
         }
 
+        size_t resp_len = sizeof(response) - 1;
+        int status_code = 200;
+        const char* content_type = "application/json";
+
         /* Check authentication */
         if (!check_auth(srv, request)) {
             resp_len = (size_t)snprintf(response, sizeof(response),
                 "{\"error\":\"unauthorized\",\"message\":\"Invalid or missing authentication token\"}");
             status_code = 401;
             content_type = "application/json";
-            
+
             /* Build HTTP response */
             char http_resp[MAX_RESPONSE_SIZE + 512];
             const char* status = "401 Unauthorized";
@@ -471,10 +475,6 @@ int aprs_http_server_run(aprs_http_server_t* srv) {
             SCLOSE(client_fd);
             continue;
         }
-
-        size_t resp_len = sizeof(response) - 1;
-        int status_code = 200;
-        const char* content_type = "application/json";
 
         /* Route requests */
         if (strcmp(method, "GET") == 0) {

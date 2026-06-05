@@ -2,7 +2,21 @@
   "permissions": {
     "allow": [
       "Bash(Get-ChildItem -Recurse -Force D:\\\\kody\\\\stare\\\\aprs)",
-      "Bash(Select-Object Mode, Length, FullName)"
+      "Bash(Select-Object Mode, Length, FullName)",
+      "Bash(Get-ChildItem *)",
+      "Bash(gcc --version)",
+      "Read(//mingw64/**)",
+      "Read(//usr/**)",
+      "Read(//c/msys64/mingw64/**)",
+      "Bash(ls /c/mingw-w64*)",
+      "Bash(dpkg -l)",
+      "Bash(where gcc *)",
+      "Read(//c/mingw64/bin/**)",
+      "Bash(wsl.exe --list --verbose)",
+      "Bash(wsl.exe *)",
+      "Read(//mnt/d/kody/stare/**)",
+      "Bash(make clean *)",
+      "Bash(make all *)"
     ]
   }
 }
